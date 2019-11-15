@@ -14,7 +14,7 @@ module "bastion" {
   subnet  = google_compute_subnetwork.source_subnet.self_link
   service_account_roles_supplemental = [
     "roles/bigquery.admin",
-    "roles/storage.objectViewer", 
+    "roles/storage.admin", 
   ]
 }
 
@@ -37,8 +37,8 @@ resource "google_compute_subnetwork" "source_subnet" {
 ## Simulate Exfil to other GCP project
 ######################################
 
-resource "google_storage_bucket_iam_member" "bound_from_attacker" {
-  bucket  = google_storage_bucket.target_bucket.name
-  role    = "roles/storage.objectAdmin"
+resource "google_project_iam_member" "bound_from_attacker" {
+  project = var.project2_id
+  role    = "roles/owner"
   member  = "serviceAccount:${module.bastion.service_account}"
 }
